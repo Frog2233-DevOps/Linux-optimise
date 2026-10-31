@@ -1,0 +1,23 @@
+name: Баг
+description: Скрипт сломался или повёл себя не так
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes: { label: Версия / sha256 скрипта }
+    validations: { required: true }
+  - type: input
+    id: os
+    attributes: { label: "ОС, провайдер, виртуализация" }
+    validations: { required: true }
+  - type: dropdown
+    id: mode
+    attributes: { label: Режим, options: [apply, check, verify] }
+  - type: textarea
+    id: cmd
+    attributes: { label: Команда запуска, render: shell }
+    validations: { required: true }
+  - type: textarea
+    id: log
+    attributes: { label: "Хвост /var/log/bootstrap.log (секреты вычисти)" }
+    validations: { required: true }

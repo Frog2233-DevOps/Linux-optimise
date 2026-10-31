@@ -1,0 +1,25 @@
+name: release
+on:
+  push: { tags: ["v*"] }
+permissions: { contents: write }
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - run: shellcheck bootstrap.sh
+      - run: bash -n bootstrap.sh
+      - id: sha
+        run: echo "value=$(sha256sum bootstrap.sh | awk '{print $1}')" >>"$GITHUB_OUTPUT"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: bootstrap.sh
+          body: |
+            `sha256: ${{ steps.sha.outputs.value }}`
+            Запуск:
+            ```
+            bash <(curl -fsSL --proto '=https' --proto-redir '=https' \
+              https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/bootstrap.sh)
+            ```
+            Сверка: `--sha256 ${{ steps.sha.outputs.value }}`

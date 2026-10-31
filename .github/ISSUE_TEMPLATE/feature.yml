@@ -1,0 +1,11 @@
+name: Запрос функции
+description: Предложить новую опцию или шаг
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: Что нужно и зачем }
+    validations: { required: true }
+  - type: textarea
+    id: risk
+    attributes: { label: Может ли это отнять доступ к машине? Как это откатывается? }
