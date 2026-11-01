@@ -1234,7 +1234,7 @@ c_ufw() { ufw status 2>/dev/null | head -1 | grep -q 'Status: active'; }
 c_ufw_ssh() { ufw status 2>/dev/null | grep -qE "^${SSH_PORT}(/tcp)?[[:space:]]"; }
 c_ufw_deny() { ufw status verbose 2>/dev/null | grep -q 'Default: deny (incoming)'; }
 c_f2b() { ((! HAS_SYSTEMD)) || systemctl is-active --quiet fail2ban; }
-c_f2b_ports() { fail2ban-client get sshd port 2>/dev/null | grep -qw "$SSH_PORT"; }
+c_f2b_ports() { fail2ban-client status sshd >/dev/null 2>&1 && grep -Eq "^port = ([0-9]+,)*${SSH_PORT}(,|$)" /etc/fail2ban/jail.d/20-bootstrap.local; }
 c_swap() { [[ "$SWAP_SIZE" == 0 || -n "$VIRT" ]] || [[ -n "$(swapon --show --noheadings 2>/dev/null)" ]]; }
 c_ping() {
   local want=DROP
@@ -1346,9 +1346,10 @@ summary() {
   local p
   for p in "${OLD_SSH_PORTS[@]}"; do
     [[ "$p" == "$SSH_PORT" ]] && continue
-    warn "переходный порт $p открыт; закрыть: $PROG --close-old-ports apply или ufw delete allow ${p}/tcp"
-  done
-  [[ -f /var/run/reboot-required ]] && warn "требуется перезагрузка (новое ядро)"
+    warn "переходный порт $p открыт; закрыть: ufw delete allow ${p}/tcp (или перезапусти скрипт с --close-old-ports)"
+  if [[ -f /var/run/reboot-required ]]; then
+    warn "требуется перезагрузка (новое ядро)"
+  fi
 }
 
 close_old_ports() {
