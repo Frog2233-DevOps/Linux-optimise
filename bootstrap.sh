@@ -857,7 +857,8 @@ do_firewall() {
     backup_file /etc/ufw/before.rules
     grep -qE '^# bootstrap.*ping' /etc/ufw/before.rules || sed -i "1i # bootstrap: block-ping=$BLOCK_PING" /etc/ufw/before.rules
     sed -i -E "0,/^# bootstrap.*ping/{s/^# bootstrap.*ping/# bootstrap: block-ping=$BLOCK_PING/}" /etc/ufw/before.rules
-    sed -i -E "s#^(-A ufw-before-input -p icmp --icmp-type echo-request) -j (ACCEPT|DROP)#\1 -j $want#" /etc/ufw/before.rules    log "ping (IPv4 echo-request) = $want"
+    sed -i -E "s#^(-A ufw-before-input -p icmp --icmp-type echo-request) -j (ACCEPT|DROP)#\1 -j $want#" /etc/ufw/before.rules
+    log "ping (IPv4 echo-request) = $want"
   fi
   ufw --force enable >/dev/null 2>&1 || warn "ufw не включился"
   ufw reload >/dev/null 2>&1 || true
