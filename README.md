@@ -16,7 +16,7 @@
 
 ```
 bash <(curl -fsSL --proto '=https' --proto-redir '=https' \
-  https://raw.githubusercontent.com/Frog2233-DevOps/Linux-optimise/<COMMIT_SHA>/bootstrap.sh)
+  https://raw.githubusercontent.com/Frog2233-DevOps/Linux-optimise/main/bootstrap.sh) --github Frog2233-DevOps
 ```
 
 Автоматика:
