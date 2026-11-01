@@ -3,7 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")/.."
 BASE="${BASE:-ubuntu:24.04}"
-OUT="tests/out"; mkdir -p "$OUT"
+OUT="tests/out"
+mkdir -p "$OUT"
 TAG="bootstrap-smoke:$(date +%s)"
 
 cleanup() { docker rm -f bootstrap-smoke >/dev/null 2>&1 || true; }
@@ -21,7 +22,8 @@ for _ in $(seq 1 30); do
   sleep 1
 done
 
-KEY="$(mktemp)"; ssh-keygen -t ed25519 -N '' -f "$KEY" >/dev/null
+KEY="$(mktemp)"
+ssh-keygen -t ed25519 -N '' -f "$KEY" >/dev/null
 docker cp bootstrap.sh bootstrap-smoke:/bootstrap.sh
 docker cp "$KEY.pub" bootstrap-smoke:/tmp/key.pub
 

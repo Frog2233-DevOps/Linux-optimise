@@ -3,8 +3,10 @@ load ../helpers
 
 @test "parse_args переключает режимы" {
   setup
-  parse_args check;   [ "$MODE" = check ]
-  parse_args verify;  [ "$MODE" = verify ]
+  parse_args check
+  [ "$MODE" = check ]
+  parse_args verify
+  [ "$MODE" = verify ]
 }
 
 @test "parse_args собирает ключи и порты" {
@@ -17,7 +19,8 @@ load ../helpers
 @test "parse_args включает docker-ufw только вместе с docker" {
   setup
   parse_args --docker-ufw
-  [ "$INSTALL_DOCKER" -eq 1 ]; [ "$DOCKER_UFW" -eq 1 ]
+  [ "$INSTALL_DOCKER" -eq 1 ]
+  [ "$DOCKER_UFW" -eq 1 ]
 }
 
 @test "parse_args на мусоре выходит с кодом 2" {
