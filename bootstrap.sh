@@ -1144,7 +1144,7 @@ EOF
   chmod 644 "$SSHD_DROPIN"
   sshd -t || die "sshd -t не прошёл" 1
   local eff
-  eff="$(sshd -T 2>/dev/null)"
+  eff="$(sshd -T 2>/dev/null | sed 's/^permitrootlogin without-password$/permitrootlogin prohibit-password/')"
   local want
   for want in "passwordauthentication no" "kbdinteractiveauthentication no" "permitrootlogin $ROOT_LOGIN_MODE" \
     "pubkeyauthentication yes" "authenticationmethods publickey" "port $SSH_PORT"; do
@@ -1202,7 +1202,7 @@ chk() {
 c_sshd_listen() { ss -H -ltn "sport = :$SSH_PORT" 2>/dev/null | grep -q .; }
 c_sshd_conf() {
   local e
-  e="$(sshd -T 2>/dev/null)"
+  e="$(sshd -T 2>/dev/null | sed 's/^permitrootlogin without-password$/permitrootlogin prohibit-password/')"
   grep -qxF "port $SSH_PORT" <<<"$e" &&
     grep -qxF "passwordauthentication no" <<<"$e" &&
     grep -qxF "permitrootlogin $ROOT_LOGIN_MODE" <<<"$e" &&
