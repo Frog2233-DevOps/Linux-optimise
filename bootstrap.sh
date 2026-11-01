@@ -1332,10 +1332,10 @@ EOF
 }
 
 load_state() {
+  [[ -r "$STATE_FILE" ]] || die "нет состояния $STATE_FILE — сначала apply (код 3)" 3
   # SCRIPT_VERSION у скрипта readonly, поэтому эту строку из state.env пропускаем
-  . <(grep -v '^SCRIPT_VERSION=' "$STATE_FILE")
   # shellcheck disable=SC1090
-  . "$STATE_FILE"
+  . <(grep -v '^SCRIPT_VERSION=' "$STATE_FILE")
   ROOT_LOGIN_MODE="${ROOT_LOGIN_MODE:-no}"
   read -r -a OPEN_ARR <<<"${OPEN_PORTS:-}"
 }
