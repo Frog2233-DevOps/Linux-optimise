@@ -30,6 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: bash tests/run-smoke.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: smoke-log, path: tests/out/, if-no-files-found: ignore }
