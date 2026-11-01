@@ -1389,13 +1389,14 @@ apply_all() {
 }
 
 main() {
+  exec 8>&2
   RUNDIR="$(mktemp -d /run/bootstrap.XXXXXX)"
   trap on_exit EXIT
   trap 'die "прервано сигналом" 1' INT TERM
   trap 'die "сбой на строке $LINENO: $BASH_COMMAND (лог: $LOG)" 1' ERR
   install -d -m 755 "$(dirname "$LOG")"
   [[ -e "$LOG" ]] || install -m 600 /dev/null "$LOG"
-  chmod 600 "$LOG"
+  chmod 600 "$LOG" 2>/dev/null || true
   chattr +a "$LOG" 2>/dev/null || true
   exec 8>>"$LOG"
   BACKUP_DIR="/var/backups/bootstrap/$(date +%Y%m%d-%H%M%S)"
