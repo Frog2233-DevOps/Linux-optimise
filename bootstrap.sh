@@ -265,6 +265,14 @@ restart_ssh() {
   fi
 }
 
+# sshd -T печатает AllowUsers по одному пользователю на строку
+sshd_allowusers() {
+  sshd -T 2>/dev/null | awk '$1=="allowusers"{print $2}' | sort | paste -sd' ' -
+}
+expected_allowusers() {
+  tr ' ' '\n' <<<"$ALLOW_USERS" | sort | paste -sd' ' -
+}
+
 rollback_ssh() {
   ((SSH_TXN)) || return 0
   SSH_TXN=0
@@ -1150,8 +1158,7 @@ EOF
     "pubkeyauthentication yes" "authenticationmethods publickey" "port $SSH_PORT"; do
     grep -qxF "$want" <<<"$eff" || die "эффективный конфиг не содержит '$want' (перебит другим drop-in?)" 1
   done
-  grep -qxF "allowusers $ALLOW_USERS" <<<"$eff" || die "AllowUsers не совпадает с ожидаемым" 1
-  [[ "$(grep -c '^allowusers ' <<<"$eff" || true)" == 1 ]] || die "AllowUsers задан более одного раза" 1
+  [[ "$(sshd_allowusers)" == "$(expected_allowusers)" ]] || die "AllowUsers не совпадает с ожидаемым: $(sshd_allowusers)" 1
   if ((HAS_SYSTEMD && SOCKET_MODE)); then
     if ((SSH_PORT != 22)); then
       mkdir -p "$(dirname "$SOCK_DROPIN")"
@@ -1206,7 +1213,7 @@ c_sshd_conf() {
   grep -qxF "port $SSH_PORT" <<<"$e" &&
     grep -qxF "passwordauthentication no" <<<"$e" &&
     grep -qxF "permitrootlogin $ROOT_LOGIN_MODE" <<<"$e" &&
-    grep -qxF "allowusers $ALLOW_USERS" <<<"$e"
+    [[ "$(sshd_allowusers)" == "$(expected_allowusers)" ]]
 }
 c_ak() {
   local ak
