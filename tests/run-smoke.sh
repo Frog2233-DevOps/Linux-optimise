@@ -22,7 +22,7 @@ for _ in $(seq 1 30); do
   sleep 1
 done
 
-KEY="$(mktemp)"
+KEY="$(mktemp -d)/key"
 ssh-keygen -t ed25519 -N '' -f "$KEY" >/dev/null
 docker cp bootstrap.sh bootstrap-smoke:/bootstrap.sh
 docker cp "$KEY.pub" bootstrap-smoke:/tmp/key.pub
