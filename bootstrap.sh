@@ -1106,6 +1106,8 @@ EOF
 }
 
 # ─────────────────────────── hardening SSH ──────────────────────────────────
+tcp_open() { timeout 2 bash -c ": </dev/tcp/127.0.0.1/$1" 2>/dev/null; }
+
 do_ssh() {
   step "Hardening SSH"
   mkdir -p /run/sshd /etc/ssh/sshd_config.d
@@ -1165,7 +1167,12 @@ EOF
   if ((HAS_SYSTEMD && SOCKET_MODE)); then
     if ((SSH_PORT != 22)); then
       mkdir -p "$(dirname "$SOCK_DROPIN")"
-      printf '[Socket]\nListenStream=\nListenStream=%s\n' "$SSH_PORT" >"$SOCK_DROPIN"
+      {
+        printf '[Socket]\nListenStream=\nListenStream=0.0.0.0:%s\n' "$SSH_PORT"
+        if [[ -e /proc/net/if_inet6 ]]; then
+          printf 'ListenStream=[::]:%s\nBindIPv6Only=ipv6-only\n' "$SSH_PORT"
+        fi
+      } >"$SOCK_DROPIN"
     else rm -f "$SOCK_DROPIN"; fi
   else
     warn "sshd слушает напрямую (без systemd-сокета)"
@@ -1175,7 +1182,7 @@ EOF
   if ((HAS_SYSTEMD)); then
     local l=0
     for _ in $(seq 1 15); do
-      ss -H -ltn "sport = :$SSH_PORT" 2>/dev/null | grep -q . && {
+      tcp_open "$SSH_PORT" && {
         l=1
         break
       }
@@ -1209,7 +1216,7 @@ chk() {
   if "$@" >/dev/null 2>&1; then pass "$id"; else fail "$id"; fi
 }
 
-c_sshd_listen() { ss -H -ltn "sport = :$SSH_PORT" 2>/dev/null | grep -q .; }
+c_sshd_listen() { tcp_open "$SSH_PORT"; } }
 c_sshd_conf() {
   local e
   e="$(sshd -T 2>/dev/null | sed 's/^permitrootlogin without-password$/permitrootlogin prohibit-password/')"
