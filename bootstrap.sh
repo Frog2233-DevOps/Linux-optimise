@@ -228,7 +228,7 @@ apt_run() { apt-get -y -q -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=
 apt_install() {
   local okp=() p
   for p in "$@"; do
-    [[ "$p" == -* ]] && continue
+    [[ -z "$p" || "$p" == -* ]] && continue
     if apt-cache show --no-all-versions "$p" >/dev/null 2>&1; then okp+=("$p"); else warn "пакета $p нет — пропуск"; fi
   done
   ((${#okp[@]})) && apt_run install --no-install-recommends "${okp[@]}"
@@ -857,7 +857,7 @@ do_firewall() {
     backup_file /etc/ufw/before.rules
     grep -qE '^# bootstrap.*ping' /etc/ufw/before.rules || sed -i "1i # bootstrap: block-ping=$BLOCK_PING" /etc/ufw/before.rules
     sed -i -E "0,/^# bootstrap.*ping/{s/^# bootstrap.*ping/# bootstrap: block-ping=$BLOCK_PING/}" /etc/ufw/before.rules
-    sed -i -E "s|^(-A ufw-before-input -p icmp --icmp-type echo-request) -j (ACCEPT|DROP)|\1 -j $want|" /etc/ufw/before.rules
+        sed -i -E "s#^(-A ufw-before-input -p icmp --icmp-type echo-request) -j (ACCEPT|DROP)#\1 -j $want#" /etc/ufw/before.rules
     log "ping (IPv4 echo-request) = $want"
   fi
   ufw --force enable >/dev/null 2>&1 || warn "ufw не включился"
