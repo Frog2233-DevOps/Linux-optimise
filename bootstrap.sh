@@ -1216,7 +1216,7 @@ chk() {
   if "$@" >/dev/null 2>&1; then pass "$id"; else fail "$id"; fi
 }
 
-c_sshd_listen() { tcp_open "$SSH_PORT"; } }
+c_sshd_listen() { tcp_open "$SSH_PORT"; }
 c_sshd_conf() {
   local e
   e="$(sshd -T 2>/dev/null | sed 's/^permitrootlogin without-password$/permitrootlogin prohibit-password/')"
