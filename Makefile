@@ -6,10 +6,10 @@ all: lint test
 lint:
 	shellcheck --version >/dev/null
 	shellcheck bootstrap.sh tests/*.bash tests/*.sh
-	shfmt -d -i 2 -ci bootstrap.sh
+	shfmt -d -i 2 -ci bootstrap.sh tests/
 
 fmt:
-	shfmt -w -i 2 -ci bootstrap.sh tests/*.bash tests/*.sh
+	shfmt -w -i 2 -ci bootstrap.sh tests/
 
 test:
 	bats tests/unit
