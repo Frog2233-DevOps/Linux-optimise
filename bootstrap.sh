@@ -1315,7 +1315,7 @@ save_state() {
 # Managed by bootstrap.sh — используется режимом verify
 STATE_VERSION=1
 APPLIED_AT='$(date -u +%FT%TZ)'
-SCRIPT_VERSION='$SCRIPT_VERSION'
+APPLIED_VERSION='$SCRIPT_VERSION'
 NEW_USER='$NEW_USER'
 SSH_PORT='$SSH_PORT'
 ALLOW_USERS='$ALLOW_USERS'
@@ -1332,7 +1332,8 @@ EOF
 }
 
 load_state() {
-  [[ -r "$STATE_FILE" ]] || die "нет состояния $STATE_FILE — сначала apply (код 3)" 3
+  # SCRIPT_VERSION у скрипта readonly, поэтому эту строку из state.env пропускаем
+  . <(grep -v '^SCRIPT_VERSION=' "$STATE_FILE")
   # shellcheck disable=SC1090
   . "$STATE_FILE"
   ROOT_LOGIN_MODE="${ROOT_LOGIN_MODE:-no}"
@@ -1427,12 +1428,7 @@ main() {
   parse_args "$@"
   # значения, сохранённые предыдущим apply, — база для повторного запуска
   # shellcheck disable=SC1090
-  if [[ -r "$STATE_FILE" ]]; then (
-    set -a
-    . "$STATE_FILE"
-    set +a
-  ); fi
-  parse_args "$@"
+
   if [[ "$MODE" == verify ]]; then
     load_state
     validate_all
