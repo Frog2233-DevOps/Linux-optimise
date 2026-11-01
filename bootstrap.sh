@@ -259,10 +259,13 @@ restart_ssh() {
   systemctl daemon-reload || return 1
   if ((SOCKET_MODE)); then
     systemctl restart ssh.socket || return 1
-    systemctl is-active --quiet ssh.service && { systemctl reload-or-restart ssh.service || return 1; }
+    if systemctl is-active --quiet ssh.service; then
+      systemctl reload-or-restart ssh.service || return 1
+    fi
   else
     systemctl reload-or-restart ssh || systemctl restart ssh || return 1
   fi
+  return 0
 }
 
 # sshd -T печатает AllowUsers по одному пользователю на строку
