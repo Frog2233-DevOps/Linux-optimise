@@ -1,4 +1,4 @@
-# script-for-server-optimization
+# Linux-optimise
 
 Базовый слой для Ubuntu 24.04 / 26.04: пользователь с ключом и sudo, SSH на нестандартном порту без пароля, UFW, fail2ban, sysctl-hardening, swap, unattended-upgrades, опционально Docker и auditd. Один файл, без зависимостей, идемпотентный, с транзакционным откатом SSH.
 
@@ -16,7 +16,7 @@
 
 ```
 bash <(curl -fsSL --proto '=https' --proto-redir '=https' \
-  https://raw.githubusercontent.com/Frog2233-DevOps/script-for-server-optimization/<COMMIT_SHA>/bootstrap.sh)
+  https://raw.githubusercontent.com/Frog2233-DevOps/Linux-optimise/<COMMIT_SHA>/bootstrap.sh)
 ```
 
 Автоматика:

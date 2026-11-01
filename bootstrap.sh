@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 #  bootstrap.sh — воспроизводимая база для Ubuntu 24.04 / 26.04
-#  v2.0.0 · MIT · https://github.com/Frog2233-DevOps/script-for-server-optimization
+#  v2.0.0 · MIT · https://github.com/Frog2233-DevOps/Linux-optimise
 #
 #  Режимы:
 #    apply   (по умолчанию) привести машину к целевому состоянию
@@ -13,7 +13,7 @@
 #
 #  Запуск (одна команда, скрипт сам спросит ключ):
 #    bash <(curl -fsSL --proto '=https' --proto-redir '=https' \
-#      https://raw.githubusercontent.com/Frog2233-DevOps/script-for-server-optimization/<SHA>/bootstrap.sh)
+#      https://raw.githubusercontent.com/Frog2233-DevOps/Linux-optimise/<SHA>/bootstrap.sh)
 #
 #  Без вопросов: ... | bash -s -- --yes --key "ssh-ed25519 AAAA... me"
 #  Повторный запуск идемпотентен. Состояние: /var/lib/bootstrap/state.env
@@ -69,7 +69,7 @@ CONFIG_FILE="${CONFIG_FILE:-}"
 
 KEY_ARGS=(); OPEN_ARR=(); OLD_SSH_PORTS=(); NEW_UFW_PORTS=()
 HAS_SYSTEMD=0; [[ -d /run/systemd/system ]] && HAS_SYSTEMD=1
-SOCKET_MODE=0; VIRT=""; BACKUP_DIR=""; SCRIPT_SHA="n/a"
+SOCKET_MODE=0; VIRT=""; BACKUP_DIR=""; SCRIPT_SHA="n/a"; PROG="${0##*/}"
 SSH_TXN=0; SSH_CUT=0; SSHD_HAD=0; SOCK_HAD=0
 RUNDIR=""; pass_count=0; fail_count=0; json_items=()
 WRITE_CHANGED=0
@@ -872,8 +872,8 @@ EOF
   SSH_CUT=1
   restart_ssh || die "ssh не перезапустился — откат" 1
   if ((HAS_SYSTEMD)); then
-    local i l=0
-    for i in $(seq 1 15); do ss -H -ltn "sport = :$SSH_PORT" 2>/dev/null | grep -q . && { l=1; break; }; sleep 1; done
+    local l=0
+    for _ in $(seq 1 15); do ss -H -ltn "sport = :$SSH_PORT" 2>/dev/null | grep -q . && { l=1; break; }; sleep 1; done
     ((l)) || die "sshd не слушает $SSH_PORT за 15с — откат" 1
     log "sshd слушает $SSH_PORT"
   fi
@@ -1062,8 +1062,9 @@ main() {
     *) [[ -r "${BASH_SOURCE[0]:-}" ]] && SCRIPT_SHA="$(sha256sum "${BASH_SOURCE[0]}" | awk '{print $1}')" ;;
   esac
   pre_scan_config "$@"
-  ST="$@"; parse_args $ST
+  parse_args "$@"
   # значения, сохранённые предыдущим apply, — база для повторного запуска
+  # shellcheck disable=SC1090
   if [[ -r "$STATE_FILE" ]]; then ( set -a; . "$STATE_FILE"; set +a ); fi
   parse_args "$@"
   if [[ "$MODE" == verify ]]; then

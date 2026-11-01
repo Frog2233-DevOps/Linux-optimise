@@ -4,7 +4,7 @@
 
 ```
 bash <(curl -fsSL --proto '=https' --proto-redir '=https' \
-  https://raw.githubusercontent.com/Frog2233-DevOps/script-for-server-optimization/<SHA>/bootstrap.sh)
+  https://raw.githubusercontent.com/Frog2233-DevOps/Linux-optimise/<SHA>/bootstrap.sh)
 ```
 
 Не закрывать текущую сессию. В новом окне:
